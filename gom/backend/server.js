@@ -10,7 +10,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/madman
 
 // CORS Configuration - Accept all origins
 const corsOptions = {
-  origin: '*',
+  origin: true, // Accept all origins
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['*'],
   optionsSuccessStatus: 200
@@ -18,7 +18,7 @@ const corsOptions = {
 
 // Middleware
 app.use(cors(corsOptions));
-app.options('*', cors()); // Handle all preflight requests
+app.options('*', cors(corsOptions)); // Handle all preflight requests
 app.use(express.json());
 
 // MongoDB Connection
