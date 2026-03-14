@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Services from './components/Services';
 import ContactForm from './components/ContactForm';
+import FutureTech3D from './components/FutureTech3D';
 import Footer from './components/Footer';
 import About from './pages/About';
 import './styles/globals.css';
@@ -19,6 +20,7 @@ function App() {
             element={
               <>
                 <Hero />
+                <FutureTech3D/>
                 <Services />
                 <ContactForm />
               </>
