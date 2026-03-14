@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 // const { MongoClient, ObjectId } = require('mongodb'); // COMMENTED OUT - DB not available
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,46 +25,45 @@ app.use(express.json());
 // let db;
 // const client = new MongoClient(MONGODB_URI);
 
-// Email Configuration
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// Email Configuration - Using Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Helper function to send email
+// Helper function to send email using Resend
 async function sendContactEmail(contactData) {
-  try {
-    const mailOptions = {
-      from: process.env.SMTP_USER,
-      to: process.env.RECIPIENT_EMAIL || 'gom123@gmail.com',
-      subject: `New Contact Form Submission - ${contactData.fullName}`,
-      html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>Full Name:</strong> ${contactData.fullName}</p>
-        <p><strong>Email:</strong> ${contactData.email}</p>
-        <p><strong>Phone:</strong> ${contactData.phone || 'Not provided'}</p>
-        <p><strong>Company:</strong> ${contactData.company || 'Not provided'}</p>
-        <p><strong>Service Type:</strong> ${contactData.serviceType}</p>
-        <p><strong>Budget:</strong> ${contactData.budget || 'Not specified'}</p>
-        <p><strong>Timeline:</strong> ${contactData.timeline || 'Not specified'}</p>
-        <h3>Message:</h3>
-        <p>${contactData.message.replace(/\n/g, '<br>')}</p>
-        <hr>
-        <p><em>Submitted on: ${new Date().toLocaleString()}</em></p>
-      `,
-      replyTo: contactData.email, // Reply directly to the sender
-    };
+  // If no Resend API key, just log it
+  if (!process.env.RESEND_API_KEY) {
+    console.log('Resend API key not configured. Contact data:', contactData);
+    return false;
+  }
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.response);
+  try {
+    const emailHtml = `
+      <h2>New Contact Form Submission</h2>
+      <p><strong>Full Name:</strong> ${contactData.fullName}</p>
+      <p><strong>Email:</strong> ${contactData.email}</p>
+      <p><strong>Phone:</strong> ${contactData.phone || 'Not provided'}</p>
+      <p><strong>Company:</strong> ${contactData.company || 'Not provided'}</p>
+      <p><strong>Service Type:</strong> ${contactData.serviceType}</p>
+      <p><strong>Budget:</strong> ${contactData.budget || 'Not specified'}</p>
+      <p><strong>Timeline:</strong> ${contactData.timeline || 'Not specified'}</p>
+      <h3>Message:</h3>
+      <p>${contactData.message.replace(/\n/g, '<br>')}</p>
+      <hr>
+      <p><em>Submitted on: ${new Date().toLocaleString()}</em></p>
+    `;
+
+    const result = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      to: process.env.RECIPIENT_EMAIL || 'gom123@gmail.com',
+      replyTo: contactData.email,
+      subject: `New Contact Form Submission - ${contactData.fullName}`,
+      html: emailHtml
+    });
+
+    console.log('Email sent via Resend:', result);
     return true;
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email via Resend:', error.message);
     return false;
   }
 }
