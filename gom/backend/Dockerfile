@@ -1,16 +1,13 @@
-# MadMann Dynamics - Go Backend
-# NOTE: Build locally with: go build -o server ./cmd/server
-# Then Docker will just run the pre-built binary
+FROM node:18-alpine
 
-FROM alpine:latest
+WORKDIR /app
 
-RUN apk --no-cache add ca-certificates
+COPY package*.json ./
 
-WORKDIR /root/
+RUN npm install
 
-# Expects pre-built server binary in backend/ directory
-COPY server ./
+COPY . .
 
 EXPOSE 8080
 
-CMD ["./server"]CMD ["./server"]
+CMD ["npm", "start"]
