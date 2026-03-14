@@ -8,8 +8,40 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/madmann';
 
+// CORS Configuration
+const allowedOrigins = [
+  'https://madmann-shrishti3-shrishti3s-projects.vercel.app', // Explicit Vercel domain
+  process.env.FRONTEND_URL
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl requests, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowedOrigins
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else if (process.env.NODE_ENV !== 'production') {
+      // In development, allow all origins
+      callback(null, true);
+    } else {
+      // Check for vercel.app domains in production
+      if (origin.includes('vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Temporarily allow all for debugging
+      }
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection
@@ -167,8 +199,8 @@ app.delete('/api/projects/:id', async (req, res) => {
   }
 });
 
-// Contact form submission
-app.post('/api/contact', async (req, res) => {
+// Contact form submission (handles both /api/contact and /api/inquiry)
+const handleContactSubmission = async (req, res) => {
   try {
     const { fullName, email, phone, company, serviceType, message, budget, timeline } = req.body;
     
@@ -206,10 +238,13 @@ app.post('/api/contact', async (req, res) => {
     console.error('Contact form error:', error);
     res.status(500).json({ error: 'Failed to submit contact form' });
   }
-});
+};
 
-// Get contacts
-app.get('/api/contacts', async (req, res) => {
+app.post('/api/contact', handleContactSubmission);
+app.post('/api/inquiry', handleContactSubmission);
+
+// Get contacts (supports both endpoints)
+const handleGetContacts = async (req, res) => {
   try {
     const contacts = db.collection('contacts');
     const data = await contacts.find({}).sort({ createdAt: -1 }).toArray();
@@ -217,7 +252,10 @@ app.get('/api/contacts', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch contacts' });
   }
-});
+};
+
+app.get('/api/contacts', handleGetContacts);
+app.get('/api/inquiries', handleGetContacts);
 
 // Start server
 app.listen(PORT, async () => {

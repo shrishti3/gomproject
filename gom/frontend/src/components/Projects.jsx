@@ -9,6 +9,8 @@ const Projects = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/projects`);
+        console.log('Fetch projects response:', response);
+        console.log(process.env.REACT_APP_API_URL);
         if (response.ok) {
           const data = await response.json();
           setProjects(data);
