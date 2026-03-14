@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -69,7 +69,7 @@ const Footer = () => {
                         </button>
                       ) : (
                         <a
-                          href="#"
+                          href="/"
                           className="text-xs text-stainless-steel hover:text-caution-yellow transition-colors"
                         >
                           {link}
@@ -94,13 +94,13 @@ const Footer = () => {
             © {currentYear} MadMann Dynamics. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-xs text-stainless-steel hover:text-caution-yellow">
+            <a href="/" className="text-xs text-stainless-steel hover:text-caution-yellow">
               Twitter
             </a>
-            <a href="#" className="text-xs text-stainless-steel hover:text-caution-yellow">
+            <a href="/" className="text-xs text-stainless-steel hover:text-caution-yellow">
               LinkedIn
             </a>
-            <a href="#" className="text-xs text-stainless-steel hover:text-caution-yellow">
+            <a href="/" className="text-xs text-stainless-steel hover:text-caution-yellow">
               GitHub
             </a>
           </div>
