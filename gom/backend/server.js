@@ -8,40 +8,18 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/madmann';
 
-// CORS Configuration
-const allowedOrigins = [
-  'https://madmann-shrishti3-shrishti3s-projects.vercel.app', // Explicit Vercel domain
-  process.env.FRONTEND_URL
-];
-
+// CORS Configuration - Simple and permissive
 const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl requests, etc.)
-    if (!origin) return callback(null, true);
-    
-    // Check if origin is in allowedOrigins
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else if (process.env.NODE_ENV !== 'production') {
-      // In development, allow all origins
-      callback(null, true);
-    } else {
-      // Check for vercel.app domains in production
-      if (origin.includes('vercel.app')) {
-        callback(null, true);
-      } else {
-        callback(null, true); // Temporarily allow all for debugging
-      }
-    }
-  },
+  origin: true, // Accept all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['*'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 200
 };
 
 // Middleware
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable preflight for all routes
 app.use(express.json());
 
 // MongoDB Connection
