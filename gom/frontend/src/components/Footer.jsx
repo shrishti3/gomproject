@@ -8,7 +8,7 @@ const Footer = () => {
 
   const footerLinks = {
     Services: ['ODM', 'SCM', 'EMS', 'Wire Harnessing'],
-    Company: ['About', 'Careers', 'Press', 'Contact'],
+    Company: ['Careers', 'Press', 'Contact'],
     Legal: ['Privacy', 'Terms', 'Cookies'],
   };
 
